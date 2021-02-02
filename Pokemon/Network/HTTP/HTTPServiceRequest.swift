@@ -13,9 +13,10 @@ struct HTTPServiceRequest: HTTPRequest {
     
     init?(endpoint: Endpoint) {
         
-        guard let url = endpoint.baseUrl?.appendingPathComponent(endpoint.path) else {
+        guard let url = (endpoint.baseUrl.flatMap { URL(string: $0.absoluteString + endpoint.path) }) else {
             return nil
         }
+        
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.httpMethod.rawValue
 

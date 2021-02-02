@@ -11,10 +11,10 @@ struct PokemonsListResponse: Codable {
     var count: Int
     var next: String?
     var previous: String?
-    var results: [PokemonBasicData]
+    var results: [PokemonsBasicData]
 }
 
-struct PokemonBasicData: Codable {
+struct PokemonsBasicData: Codable {
     var name: String
     var url: String
 }
