@@ -9,6 +9,5 @@ import Foundation
 
 struct PokemonCellViewModel {
     var name: String
-    var imageUrl: String?
     var url: String?
 }

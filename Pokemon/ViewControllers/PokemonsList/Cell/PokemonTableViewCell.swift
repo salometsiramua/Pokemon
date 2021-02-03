@@ -14,8 +14,10 @@ protocol PokemonTableViewCellConfigurable {
 class PokemonTableViewCell: UITableViewCell {
     
     private var spinner = UIActivityIndicatorView(style: .gray)
+    private var stackView = UIStackView()
+    private var imagesStackView = UIStackView()
     private var name = UILabel()
-    private var avatar = UIImageView()
+    public var avatar = UIImageView()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -28,21 +30,29 @@ class PokemonTableViewCell: UITableViewCell {
     }
     
     private func setupUI() {
-        contentView.addSubview(name)
-        //        contentView.addSubview(avatar)
+        stackView.axis = .vertical
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.addArrangedSubview(name)
+        
+        imagesStackView.axis = .horizontal
+        imagesStackView.addArrangedSubview(avatar)
+        stackView.addArrangedSubview(imagesStackView)
+        contentView.addSubview(stackView)
+        
         contentView.addSubview(spinner)
         
-        name.translatesAutoresizingMaskIntoConstraints = false
-        name.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.Spacing.margin.value).isActive = true
-        name.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        name.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.pin(to: contentView, edgeInsets: .init(top: Constants.Spacing.padding.value, left: Constants.Spacing.margin.value, bottom: Constants.Spacing.padding.value, right: Constants.Spacing.margin.value))
+        
         name.textColor = Constants.Colors.title.value
+        name.textAlignment = .center
         
         spinner.translatesAutoresizingMaskIntoConstraints = false
         
         spinner.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         spinner.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         spinner.hidesWhenStopped = true
+        
+        avatar.contentMode = .scaleAspectFit
     }
 }
 
@@ -55,5 +65,7 @@ extension PokemonTableViewCell: PokemonTableViewCellConfigurable {
         } else {
             spinner.stopAnimating()
         }
+        
+        avatar.image = UIImage(named: "placeholder")
     }
 }

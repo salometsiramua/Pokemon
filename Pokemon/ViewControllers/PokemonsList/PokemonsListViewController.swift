@@ -9,11 +9,11 @@ import UIKit
 
 protocol PokemonsDataSourceUpdatedListener {
     func reloadTable(rows: [IndexPath])
-    func showError(error: Error)
+    func showAlert(with error: Error)
 }
 
 class PokemonsListViewController: UIViewController {
-
+    
     lazy var viewModel: PokemonsListViewModel = PokemonsListViewModelService()
     
     private let tableView = UITableView()
@@ -32,35 +32,16 @@ class PokemonsListViewController: UIViewController {
         tableView.prefetchDataSource = self
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-        
-        tableView.rowHeight = 50
+        tableView.pin(to: view)
+        tableView.rowHeight = 100
         tableView.tableFooterView = UIView(frame: .zero)
         tableView.register(PokemonTableViewCell.self, forCellReuseIdentifier: PokemonTableViewCell.identifier)
         
         viewModel.delegate = self
         viewModel.fetchPokemons()
-        
-//        { [weak self] (response) in
-//            switch response {
-//            case .success:
-//                DispatchQueue.main.async {
-//                    self?.tableView.reloadData()
-//                }
-//            case .failure(let error):
-//                DispatchQueue.main.async {
-//                    self?.showAlert(with: error)
-//                }
-//            }
-//        }
     }
     
-    private func showAlert(with error: Error) {
+    internal func showAlert(with error: Error) {
         
     }
 }
@@ -79,13 +60,37 @@ extension PokemonsListViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: PokemonTableViewCell.identifier, for: indexPath) as? PokemonTableViewCell else {
             return UITableViewCell()
         }
+        cell.selectionStyle = .none
+        
         if isLoadingCell(for: indexPath) {
             cell.configure(with: nil)
         } else {
             cell.configure(with: viewModel.pokemons[indexPath.row])
         }
         
+        cell.tag = indexPath.row
+        
+        viewModel.image(for: indexPath) { [weak self] (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let imageCache):
+                    guard cell.tag == imageCache.index else {
+                        return
+                    }
+                    cell.avatar.image = imageCache.image
+                case .failure(let error):
+                    self?.showAlert(with: error)
+                }
+            }
+        }
+        
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let pokemonDetailsViewController = PokemonsDetailsViewController()
+        pokemonDetailsViewController.viewModel = PokemonsDetailsViewModelService(url: viewModel.pokemons[indexPath.row].url)
+        navigationController?.pushViewController(pokemonDetailsViewController, animated: true)
     }
 }
 
@@ -98,19 +103,16 @@ extension PokemonsListViewController: UITableViewDataSourcePrefetching {
     
     private func isLoadingCell(for indexPath: IndexPath) -> Bool {
         return indexPath.row >= viewModel.pokemons.count
-      }
-
+    }
+    
     private func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
         let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
         let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
         return Array(indexPathsIntersection)
-      }
+    }
 }
 
 extension PokemonsListViewController: PokemonsDataSourceUpdatedListener {
-    func showError(error: Error) {
-        showAlert(with: error)
-    }
     
     func reloadTable(rows: [IndexPath]) {
         DispatchQueue.main.async {
@@ -120,7 +122,7 @@ extension PokemonsListViewController: PokemonsDataSourceUpdatedListener {
                 return
             }
             self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
-
+            
         }
     }
 }

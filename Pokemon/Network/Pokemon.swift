@@ -66,6 +66,12 @@ struct Pokemon: Codable {
     }
 }
 
+extension Pokemon: MappableResponse {
+    init(data: Data) throws {
+        self = try JSONDecoder().decode(Pokemon.self, from: data)
+    }
+}
+
 struct Ability: Codable {
     
 }
