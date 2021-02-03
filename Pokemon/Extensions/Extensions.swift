@@ -18,6 +18,23 @@ extension UIView {
         topAnchor.constraint(equalTo: view.topAnchor, constant: edgeInsets.top).isActive = true
         bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -edgeInsets.bottom).isActive = true
     }
+    
+    func pinToTop(to view: UIView, edgeInsets: UIEdgeInsets = .zero) {
+        leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: edgeInsets.left).isActive = true
+        trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -edgeInsets.right).isActive = true
+        topAnchor.constraint(equalTo: view.topAnchor, constant: edgeInsets.top).isActive = true
+    }
+    
+    func pinToBottom(to view: UIView, edgeInsets: UIEdgeInsets = .zero) {
+        leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: edgeInsets.left).isActive = true
+        trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -edgeInsets.right).isActive = true
+        bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -edgeInsets.bottom).isActive = true
+    }
+    
+    func pinToEdges(to view: UIView, edgeInsets: UIEdgeInsets = .zero) {
+        leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: edgeInsets.left).isActive = true
+        trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -edgeInsets.right).isActive = true
+    }
 }
 
 extension UIImageView {
@@ -45,5 +62,13 @@ extension UIImageView {
 extension String {
     var pokemonsIndex: String? {
         return components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+    }
+}
+
+extension UIViewController {
+    func showError(error: Error) {
+        let alert = UIAlertController(title: "Error occured", message: error.localizedDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "calcel", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }

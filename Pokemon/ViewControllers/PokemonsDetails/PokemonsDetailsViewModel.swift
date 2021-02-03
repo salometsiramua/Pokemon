@@ -5,7 +5,7 @@
 //  Created by Salome Tsiramua on 2/2/21.
 //
 
-import Foundation
+import UIKit
 
 protocol PokemonsDetailsViewModel {
     var url: String? { get }
@@ -20,7 +20,8 @@ class PokemonsDetailsViewModelService: PokemonsDetailsViewModel {
     var url: String?
 
     private let pokemonsDetailsFetcher: PokemonsDetailsFetcher
-
+    private let utilityQueue = DispatchQueue.global(qos: .utility)
+    
     var pokemon: Pokemon?
     
     init(pokemonsDetailsFetcher: PokemonsDetailsFetcher = PokemonsDetailsFetcherService(), url: String?) {
@@ -35,9 +36,32 @@ class PokemonsDetailsViewModelService: PokemonsDetailsViewModel {
             switch result {
             case .success(let pokemon):
                 self?.pokemon = pokemon
+                self?.loadImages(from: pokemon.allImages)
                 self?.delegate?.reload()
             case .failure(let error):
                 self?.delegate?.showError(error: error)
+            }
+        }
+    }
+    
+    func loadImages(from list: [String]) {
+        list.forEach { (url) in
+            loadImage(url: url) { [weak self] (image) in
+                guard let image = image else {
+                    return
+                }
+                self?.delegate?.appendImage(image: image)
+            }
+        }
+    }
+    
+    private func loadImage(url: String, completion: @escaping (UIImage?) -> ()) {
+        utilityQueue.async {
+            guard let url = URL(string: url), let data = try? Data(contentsOf: url) else { return }
+            let image = UIImage(data: data)
+            
+            DispatchQueue.main.async {
+                completion(image)
             }
         }
     }

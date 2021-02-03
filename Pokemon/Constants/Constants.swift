@@ -25,6 +25,7 @@ enum Constants {
     enum Spacing {
         case margin
         case padding
+        case topMargin
         
         var value: CGFloat {
             switch self {
@@ -32,6 +33,8 @@ enum Constants {
                 return 30
             case .padding:
                 return 10
+            case .topMargin:
+                return 50
             }
         }
     }

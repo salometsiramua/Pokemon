@@ -38,7 +38,6 @@ class PokemonsListViewModelService: PokemonsListViewModel {
     private let cache = NSCache<NSNumber, UIImage>()
     private let utilityQueue = DispatchQueue.global(qos: .utility)
 
-    
     init(pokemonsListFetcher: PokemonsListFetcher = PokemonsListFetcherService()) {
         self.pokemonsListFetcher = pokemonsListFetcher
     }

@@ -15,7 +15,6 @@ class PokemonTableViewCell: UITableViewCell {
     
     private var spinner = UIActivityIndicatorView(style: .gray)
     private var stackView = UIStackView()
-    private var imagesStackView = UIStackView()
     private var name = UILabel()
     public var avatar = UIImageView()
     
@@ -30,35 +29,39 @@ class PokemonTableViewCell: UITableViewCell {
     }
     
     private func setupUI() {
-        stackView.axis = .vertical
+        stackView.axis = .horizontal
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.addArrangedSubview(avatar)
         stackView.addArrangedSubview(name)
+        stackView.backgroundColor = .clear
+        stackView.alignment = .fill
+        stackView.distribution = .fillProportionally
         
-        imagesStackView.axis = .horizontal
-        imagesStackView.addArrangedSubview(avatar)
-        stackView.addArrangedSubview(imagesStackView)
         contentView.addSubview(stackView)
-        
         contentView.addSubview(spinner)
+        contentView.backgroundColor = .clear
+        backgroundView?.backgroundColor = .clear
         
-        stackView.pin(to: contentView, edgeInsets: .init(top: Constants.Spacing.padding.value, left: Constants.Spacing.margin.value, bottom: Constants.Spacing.padding.value, right: Constants.Spacing.margin.value))
+        stackView.pin(to: contentView, edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: 0, right: Constants.Spacing.margin.value))
         
         name.textColor = Constants.Colors.title.value
         name.textAlignment = .center
+        name.font = .systemFont(ofSize: 30)
         
         spinner.translatesAutoresizingMaskIntoConstraints = false
-        
         spinner.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         spinner.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         spinner.hidesWhenStopped = true
         
+        avatar.translatesAutoresizingMaskIntoConstraints = false
         avatar.contentMode = .scaleAspectFit
+        avatar.widthAnchor.constraint(equalToConstant: contentView.frame.height * 1.5).isActive = true
     }
 }
 
 extension PokemonTableViewCell: PokemonTableViewCellConfigurable {
     func configure(with viewModel: PokemonCellViewModel?) {
-        name.text = viewModel?.name
+        name.text = viewModel?.name.uppercased()
         
         if viewModel == nil {
             spinner.startAnimating()
