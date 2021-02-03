@@ -30,6 +30,7 @@
 		B3F9966D25C9B58800222456 /* UIView+Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F9966C25C9B58800222456 /* UIView+Tests.swift */; };
 		B3F9968625C9C97500222456 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F9968525C9C97500222456 /* ImageDownloader.swift */; };
 		B3F9968B25C9D33500222456 /* StringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F9968A25C9D33500222456 /* StringTests.swift */; };
+		B3F996A725CB22F700222456 /* HorizontalProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F996A625CB22F700222456 /* HorizontalProgressBar.swift */; };
 		F19E510F25C92F4D003D2487 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19E510E25C92F4D003D2487 /* AppDelegate.swift */; };
 		F19E511925C92F4D003D2487 /* Pokemon.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F19E511725C92F4D003D2487 /* Pokemon.xcdatamodeld */; };
 		F19E511B25C92F55003D2487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F19E511A25C92F55003D2487 /* Assets.xcassets */; };
@@ -93,6 +94,7 @@
 		B3F9966C25C9B58800222456 /* UIView+Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Tests.swift"; sourceTree = "<group>"; };
 		B3F9968525C9C97500222456 /* ImageDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDownloader.swift; sourceTree = "<group>"; };
 		B3F9968A25C9D33500222456 /* StringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringTests.swift; sourceTree = "<group>"; };
+		B3F996A625CB22F700222456 /* HorizontalProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalProgressBar.swift; sourceTree = "<group>"; };
 		F19E510B25C92F4D003D2487 /* Pokemon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pokemon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F19E510E25C92F4D003D2487 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F19E511825C92F4D003D2487 /* Pokemon.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Pokemon.xcdatamodel; sourceTree = "<group>"; };
@@ -242,6 +244,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		B3F996A525CB22E500222456 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B3F996A625CB22F700222456 /* HorizontalProgressBar.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		F19E510225C92F4D003D2487 = {
 			isa = PBXGroup;
 			children = (
@@ -265,6 +275,7 @@
 		F19E510D25C92F4D003D2487 /* Pokemon */ = {
 			isa = PBXGroup;
 			children = (
+				B3F996A525CB22E500222456 /* Views */,
 				B37413D325C9592500DF493C /* Extensions */,
 				B37413CA25C956B400DF493C /* Constants */,
 				F19E516025C932B9003D2487 /* Network */,
@@ -475,6 +486,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3F9962125C9856400222456 /* PokemonsDetailsViewController.swift in Sources */,
+				B3F996A725CB22F700222456 /* HorizontalProgressBar.swift in Sources */,
 				F19E517225C932DB003D2487 /* HTTPRequestSession.swift in Sources */,
 				B37413C325C9551900DF493C /* PokemonCellViewModel.swift in Sources */,
 				F19E517D25C932EB003D2487 /* NetworkError.swift in Sources */,

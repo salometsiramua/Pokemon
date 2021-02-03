@@ -13,6 +13,10 @@ protocol PokemonsDetailsUpdatedListener {
     func appendImage(image: UIImage)
 }
 
+enum DetailsScreenScrollViews: Int {
+    case main
+    case images
+}
 
 class PokemonsDetailsViewController: UIViewController {
     
@@ -20,20 +24,23 @@ class PokemonsDetailsViewController: UIViewController {
     
     private var name = UILabel(frame: .zero)
     private var weight = UILabel(frame: .zero)
+    private var types = UILabel(frame: .zero)
     
-    //private var verticalStackView = UIScrollView(frame: .zero)
+    private var mainScrollView = UIScrollView(frame: .zero)
+    private var verticalStackView = UIStackView(frame: .zero)
     private var imagesContainerScrollView = UIScrollView(frame: .zero)
     private var horizontalImagesStackView = UIStackView(frame: .zero)
     
     private var statsStackView = UIStackView(frame: .zero)
-    private var typesStackView = UIStackView(frame: .zero)
     
     private var pageControl = UIPageControl(frame: .zero)
     
     override func loadView() {
         super.loadView()
         
-        setupUI()
+        setupMainView()
+        setupImagesStack()
+        setupComponents()
         
         viewModel?.delegate = self
         navigationController?.navigationBar.tintColor = .black
@@ -49,7 +56,7 @@ class PokemonsDetailsViewController: UIViewController {
         viewModel?.fetchDetails()
     }
     
-    private func setupUI() {
+    private func setupMainView() {
         let backgroundView = UIImageView(image: UIImage(named: "green"))
         backgroundView.contentMode = .scaleAspectFill
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
@@ -57,31 +64,48 @@ class PokemonsDetailsViewController: UIViewController {
         view.addSubview(backgroundView)
         backgroundView.pin(to: view)
         
-        view.addSubview(imagesContainerScrollView)
+        view.addSubview(mainScrollView)
+        mainScrollView.pin(to: view)
+        mainScrollView.translatesAutoresizingMaskIntoConstraints = false
+        mainScrollView.addSubview(verticalStackView)
+        mainScrollView.tag = DetailsScreenScrollViews.main.rawValue
+        
+        verticalStackView.pin(to: mainScrollView, edgeInsets: .init(top: 0, left: 0, bottom: Constants.Spacing.margin.value, right: 0))
+        verticalStackView.widthAnchor.constraint(equalTo: mainScrollView.widthAnchor).isActive = true
+        verticalStackView.translatesAutoresizingMaskIntoConstraints = false
+        verticalStackView.axis = .vertical
+        verticalStackView.alignment = .fill
+        verticalStackView.distribution = .equalSpacing
+        verticalStackView.spacing = Constants.Spacing.margin.value
+    }
+    
+    private func setupImagesStack() {
+        verticalStackView.addArrangedSubview(imagesContainerScrollView)
         
         imagesContainerScrollView.translatesAutoresizingMaskIntoConstraints = false
-        imagesContainerScrollView.pinToTop(to: view, edgeInsets: .init(top: Constants.Spacing.margin.value, left: 0, bottom: 0, right: 0))
-        
+        imagesContainerScrollView.tag = DetailsScreenScrollViews.images.rawValue
         imagesContainerScrollView.showsVerticalScrollIndicator = false
         imagesContainerScrollView.showsHorizontalScrollIndicator = false
         imagesContainerScrollView.addSubview(horizontalImagesStackView)
         imagesContainerScrollView.delegate = self
-        
-        horizontalImagesStackView.pin(to: imagesContainerScrollView)
-        
         imagesContainerScrollView.heightAnchor.constraint(equalTo: horizontalImagesStackView.heightAnchor).isActive = true
-        
         imagesContainerScrollView.heightAnchor.constraint(equalToConstant: 150).isActive = true
         imagesContainerScrollView.isPagingEnabled = true
         
+        horizontalImagesStackView.pin(to: imagesContainerScrollView)
         horizontalImagesStackView.axis = .horizontal
         horizontalImagesStackView.distribution = .equalSpacing
         horizontalImagesStackView.alignment = .fill
         horizontalImagesStackView.spacing = 0
         horizontalImagesStackView.translatesAutoresizingMaskIntoConstraints = false
-        
+    }
+    
+    private func setupComponents() {
+    
         name.translatesAutoresizingMaskIntoConstraints = false
         name.textColor = Constants.Colors.title.value
+        name.textAlignment = .center
+        name.font = .boldSystemFont(ofSize: 25)
         
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         pageControl.currentPage = 0
@@ -89,42 +113,41 @@ class PokemonsDetailsViewController: UIViewController {
         pageControl.pageIndicatorTintColor = .lightGray
         pageControl.currentPageIndicatorTintColor = .green
         
-        view.addSubview(pageControl)
-        
-        pageControl.topAnchor.constraint(equalTo: imagesContainerScrollView.bottomAnchor, constant: Constants.Spacing.padding.value).isActive = true
-        pageControl.pinToEdges(to: view)
-        
-        view.addSubview(name)
-        
-        name.topAnchor.constraint(equalTo: pageControl.bottomAnchor, constant: Constants.Spacing.padding.value).isActive = true
-        name.pinToEdges(to: view)
-        name.textAlignment = .center
-        name.font = .boldSystemFont(ofSize: 25)
+        verticalStackView.addArrangedSubview(pageControl)
+        verticalStackView.addArrangedSubview(name)
         
         statsStackView.translatesAutoresizingMaskIntoConstraints = false
         statsStackView.axis = .vertical
-        view.addSubview(statsStackView)
-        statsStackView.pinToBottom(to: view, edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: Constants.Spacing.margin.value, right: Constants.Spacing.margin.value))
         statsStackView.spacing = Constants.Spacing.padding.value
-        statsStackView.alignment = .leading
         
-        typesStackView.translatesAutoresizingMaskIntoConstraints = false
-        typesStackView.axis = .vertical
-        view.addSubview(typesStackView)
-        typesStackView.pinToBottom(to: view, edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: Constants.Spacing.margin.value, right: Constants.Spacing.margin.value))
-        typesStackView.spacing = Constants.Spacing.padding.value
-        typesStackView.alignment = .trailing
+        verticalStackView.addArrangedSubview(types)
+        verticalStackView.addArrangedSubview(statsStackView)
+        
+        statsStackView.spacing = Constants.Spacing.margin.value
+        statsStackView.alignment = .center
+        
+        types.translatesAutoresizingMaskIntoConstraints = false
+        types.textAlignment = .center
+        types.font = .systemFont(ofSize: 20)
     }
 }
 
 extension PokemonsDetailsViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.tag == DetailsScreenScrollViews.images.rawValue else {
+            return
+        }
+        
         if scrollView.contentOffset.y > 0 || scrollView.contentOffset.y < 0 {
             scrollView.contentOffset.y = 0
         }
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        guard scrollView.tag == DetailsScreenScrollViews.images.rawValue else {
+            return
+        }
+        
         let pageNumber = round(scrollView.contentOffset.x / scrollView.frame.size.width)
         pageControl.currentPage = Int(pageNumber)
     }
@@ -145,7 +168,7 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
     
     func reload() {
         DispatchQueue.main.async {
-            self.name.text = self.viewModel?.pokemon?.name
+            self.name.text = self.viewModel?.pokemon?.name.capitalized
             self.fillStatsStackView()
             self.fillTypesStackView()
         }
@@ -154,46 +177,41 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
     func fillStatsStackView() {
         
         viewModel?.pokemon?.stats.forEach({ (stat) in
-            let view = UIView()
+            let stackView = UIStackView()
+            stackView.axis = .vertical
+            
             let title = UILabel()
-            let value = UILabel()
-            view.addSubview(title)
-            view.addSubview(value)
+            let progressBar = HorizontalProgressBar(frame: .zero)
             
-            title.pinToTop(to: view)
-            value.pinToBottom(to: view)
-            title.bottomAnchor.constraint(equalTo: value.topAnchor).isActive = true
+            stackView.addArrangedSubview(title)
+            stackView.addArrangedSubview(progressBar)
+            stackView.spacing = Constants.Spacing.padding.value
             
-            view.translatesAutoresizingMaskIntoConstraints = false
+            stackView.translatesAutoresizingMaskIntoConstraints = false
             title.translatesAutoresizingMaskIntoConstraints = false
-            value.translatesAutoresizingMaskIntoConstraints = false
+            progressBar.translatesAutoresizingMaskIntoConstraints = false
+            progressBar.heightAnchor.constraint(equalToConstant: 10).isActive = true
+            progressBar.widthAnchor.constraint(equalToConstant: view.frame.width * 0.8).isActive = true
+            progressBar.color = .green
+            progressBar.backgroundColor = .white
+            progressBar.progress = CGFloat(stat.effort)/CGFloat(stat.baseStat)
             
-            title.text = "\(stat.stat.name):"
-            value.text = "\(stat.effort)/\(stat.baseStat)"
-            statsStackView.addArrangedSubview(view)
+            title.textAlignment = .left
+            title.text = "\(stat.stat.name.capitalized): \(stat.effort)/\(stat.baseStat)"
+            title.font = .boldSystemFont(ofSize: 18)
+            statsStackView.addArrangedSubview(stackView)
         })
     }
     
     func fillTypesStackView() {
         
+        var text = ""
         viewModel?.pokemon?.types.forEach({ (type) in
-            let view = UIView()
-            let title = UILabel()
-            let value = UILabel()
-            view.addSubview(title)
-            view.addSubview(value)
-            
-            title.pinToTop(to: view)
-            value.pinToBottom(to: view)
-            title.bottomAnchor.constraint(equalTo: value.topAnchor).isActive = true
-            
-            view.translatesAutoresizingMaskIntoConstraints = false
-            title.translatesAutoresizingMaskIntoConstraints = false
-            value.translatesAutoresizingMaskIntoConstraints = false
-            
-            title.text = "\(type.type.name):"
-            value.text = "\(type.slot)"
-            typesStackView.addArrangedSubview(view)
+            if !text.isEmpty {
+                text += " / "
+            }
+            text += type.type.name
         })
+        types.text = text
     }
 }

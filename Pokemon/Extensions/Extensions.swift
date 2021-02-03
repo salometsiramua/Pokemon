@@ -19,6 +19,13 @@ extension UIView {
         bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -edgeInsets.bottom).isActive = true
     }
     
+    func pinToLeading(to view: UIView, edgeInsets: UIEdgeInsets = .zero) {
+        leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: edgeInsets.left).isActive = true
+        trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -edgeInsets.right).isActive = true
+        topAnchor.constraint(equalTo: view.topAnchor, constant: edgeInsets.top).isActive = true
+        bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -edgeInsets.bottom).isActive = true
+    }
+    
     func pinToTop(to view: UIView, edgeInsets: UIEdgeInsets = .zero) {
         leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: edgeInsets.left).isActive = true
         trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -edgeInsets.right).isActive = true
@@ -34,6 +41,11 @@ extension UIView {
     func pinToEdges(to view: UIView, edgeInsets: UIEdgeInsets = .zero) {
         leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: edgeInsets.left).isActive = true
         trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -edgeInsets.right).isActive = true
+    }
+    
+    func pinToCenter(to view: UIView) {
+        centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
 }
 

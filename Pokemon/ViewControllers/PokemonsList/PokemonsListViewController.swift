@@ -21,11 +21,30 @@ class PokemonsListViewController: UIViewController {
     override func loadView() {
         super.loadView()
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(named: "green"), for: .default)
-        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.view.backgroundColor = .clear
         navigationController?.navigationBar.shadowImage = UIImage()
-        navigationItem.titleView = UIImageView(image: UIImage(named: "navTitle"))
+        
+        let titleView = UIView()
+        titleView.backgroundColor = .clear
+        let titleImageView = UIImageView(image: UIImage(named: "logo"))
+        titleView.addSubview(titleImageView)
+        titleImageView.translatesAutoresizingMaskIntoConstraints = false
+        titleImageView.pinToCenter(to: titleView)
+        titleImageView.heightAnchor.constraint(equalToConstant: navigationController?.navigationBar.frame.height ?? 44).isActive = true
+        titleImageView.widthAnchor.constraint(equalTo: titleImageView.heightAnchor, multiplier: 1024/377).isActive = true
+        
+        navigationItem.titleView = titleView
+        setupBackgroundView()
         setupTableView()
+    }
+    
+    private func setupBackgroundView() {
+        let backgroundImageView = UIImageView(image: UIImage(named: "green"))
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundImageView.contentMode = .scaleAspectFill
+        view.addSubview(backgroundImageView)
+        backgroundImageView.pin(to: view)
     }
     
     private func setupTableView() {
@@ -34,15 +53,14 @@ class PokemonsListViewController: UIViewController {
         tableView.prefetchDataSource = self
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.pin(to: view)
+        let topMargin = UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.frame.size.height ?? 44)
+        tableView.pin(to: view, edgeInsets: .init(top: topMargin, left: 0, bottom: 0, right: 0))
+        
         tableView.rowHeight = 100
         tableView.tableFooterView = UIView(frame: .zero)
         tableView.register(PokemonTableViewCell.self, forCellReuseIdentifier: PokemonTableViewCell.identifier)
         
-        let backgroundImageView = UIImageView(image: UIImage(named: "green"))
-        backgroundImageView.contentMode = .scaleAspectFill
-        tableView.backgroundView = backgroundImageView
-
+        tableView.backgroundColor = .clear
         viewModel.delegate = self
         viewModel.fetchPokemons()
     }

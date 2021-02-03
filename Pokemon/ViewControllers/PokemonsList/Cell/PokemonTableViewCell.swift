@@ -34,19 +34,20 @@ class PokemonTableViewCell: UITableViewCell {
         stackView.addArrangedSubview(avatar)
         stackView.addArrangedSubview(name)
         stackView.backgroundColor = .clear
-        stackView.alignment = .fill
-        stackView.distribution = .fillProportionally
+        stackView.alignment = .center
+        stackView.distribution = .equalSpacing
+        stackView.spacing = Constants.Spacing.margin.value
         
         contentView.addSubview(stackView)
         contentView.addSubview(spinner)
         contentView.backgroundColor = .clear
         backgroundView?.backgroundColor = .clear
         
-        stackView.pin(to: contentView, edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: 0, right: Constants.Spacing.margin.value))
+        stackView.pinToLeading(to: contentView, edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: 0, right: Constants.Spacing.margin.value))
         
         name.textColor = Constants.Colors.title.value
         name.textAlignment = .center
-        name.font = .systemFont(ofSize: 30)
+        name.font = .systemFont(ofSize: 20)
         
         spinner.translatesAutoresizingMaskIntoConstraints = false
         spinner.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
