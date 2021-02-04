@@ -43,11 +43,10 @@ class PokemonTableViewCell: UITableViewCell {
         contentView.backgroundColor = .clear
         backgroundView?.backgroundColor = .clear
         
-        stackView.pinToLeading(to: contentView, edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: 0, right: Constants.Spacing.margin.value))
+        stackView.pin(to: contentView, directions: [.leading, .top, .bottom], edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: 0, right: Constants.Spacing.margin.value))
         
-        name.textColor = Constants.Colors.title.value
         name.textAlignment = .center
-        name.font = .systemFont(ofSize: 20)
+        name.setStyle(.header)
         
         spinner.translatesAutoresizingMaskIntoConstraints = false
         spinner.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
@@ -70,6 +69,6 @@ extension PokemonTableViewCell: PokemonTableViewCellConfigurable {
             spinner.stopAnimating()
         }
         
-        avatar.image = UIImage(named: "placeholder")
+        avatar.image = viewModel?.image ?? UIImage(named: "placeholder")
     }
 }

@@ -10,6 +10,7 @@ import UIKit
 protocol PokemonsDataSourceUpdatedListener {
     func reloadTable(rows: [IndexPath])
     func showAlert(with error: Error)
+    func setLoading(hidden: Bool)
 }
 
 class PokemonsListViewController: UIViewController {
@@ -30,13 +31,17 @@ class PokemonsListViewController: UIViewController {
         let titleImageView = UIImageView(image: UIImage(named: "logo"))
         titleView.addSubview(titleImageView)
         titleImageView.translatesAutoresizingMaskIntoConstraints = false
-        titleImageView.pinToCenter(to: titleView)
+        titleImageView.pin(to: titleView)
         titleImageView.heightAnchor.constraint(equalToConstant: navigationController?.navigationBar.frame.height ?? 44).isActive = true
         titleImageView.widthAnchor.constraint(equalTo: titleImageView.heightAnchor, multiplier: 1024/377).isActive = true
         
         navigationItem.titleView = titleView
+        
+        startIndicatingActivity()
         setupBackgroundView()
         setupTableView()
+        
+        view.bringSubviewToFront(indicator)
     }
     
     private func setupBackgroundView() {
@@ -142,8 +147,13 @@ extension PokemonsListViewController: UITableViewDataSourcePrefetching {
 
 extension PokemonsListViewController: PokemonsDataSourceUpdatedListener {
     
-    func reloadTable(rows: [IndexPath]) {
+    func reloadTable(rows: [IndexPath] = []) {
+        stopIndicatingActivity()
         DispatchQueue.main.async {
+            guard !rows.isEmpty else {
+                self.tableView.reloadData()
+                return
+            }
             let indexPathsToReload = self.visibleIndexPathsToReload(intersecting: rows)
             guard !indexPathsToReload.isEmpty else {
                 self.tableView.reloadData()
@@ -152,5 +162,9 @@ extension PokemonsListViewController: PokemonsDataSourceUpdatedListener {
             self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
             
         }
+    }
+    
+    func setLoading(hidden: Bool) {
+        
     }
 }

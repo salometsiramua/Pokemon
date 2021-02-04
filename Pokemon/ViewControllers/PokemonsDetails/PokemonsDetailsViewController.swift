@@ -44,6 +44,8 @@ class PokemonsDetailsViewController: UIViewController {
         
         viewModel?.delegate = self
         navigationController?.navigationBar.tintColor = .black
+        
+        startIndicatingActivity()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -89,7 +91,7 @@ class PokemonsDetailsViewController: UIViewController {
         imagesContainerScrollView.addSubview(horizontalImagesStackView)
         imagesContainerScrollView.delegate = self
         imagesContainerScrollView.heightAnchor.constraint(equalTo: horizontalImagesStackView.heightAnchor).isActive = true
-        imagesContainerScrollView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        imagesContainerScrollView.heightAnchor.constraint(equalToConstant: view.frame.width * 0.7).isActive = true
         imagesContainerScrollView.isPagingEnabled = true
         
         horizontalImagesStackView.pin(to: imagesContainerScrollView)
@@ -103,9 +105,8 @@ class PokemonsDetailsViewController: UIViewController {
     private func setupComponents() {
     
         name.translatesAutoresizingMaskIntoConstraints = false
-        name.textColor = Constants.Colors.title.value
         name.textAlignment = .center
-        name.font = .boldSystemFont(ofSize: 25)
+        name.setStyle(.title)
         
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         pageControl.currentPage = 0
@@ -128,7 +129,7 @@ class PokemonsDetailsViewController: UIViewController {
         
         types.translatesAutoresizingMaskIntoConstraints = false
         types.textAlignment = .center
-        types.font = .systemFont(ofSize: 20)
+        types.setStyle(.header)
     }
 }
 
@@ -168,14 +169,14 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
     
     func reload() {
         DispatchQueue.main.async {
+            self.stopIndicatingActivity()
             self.name.text = self.viewModel?.pokemon?.name.capitalized
-            self.fillStatsStackView()
-            self.fillTypesStackView()
+            self.fillStatsStackView(with: self.viewModel)
+            self.fillTypesStackView(with: self.viewModel)
         }
     }
     
-    func fillStatsStackView() {
-        
+    func fillStatsStackView(with viewModel: PokemonsDetailsViewModel?) {
         viewModel?.pokemon?.stats.forEach({ (stat) in
             let stackView = UIStackView()
             stackView.axis = .vertical
@@ -198,13 +199,12 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
             
             title.textAlignment = .left
             title.text = "\(stat.stat.name.capitalized): \(stat.effort)/\(stat.baseStat)"
-            title.font = .boldSystemFont(ofSize: 18)
+            title.setStyle(.text)
             statsStackView.addArrangedSubview(stackView)
         })
     }
     
-    func fillTypesStackView() {
-        
+    func fillTypesStackView(with viewModel: PokemonsDetailsViewModel?) {
         var text = ""
         viewModel?.pokemon?.types.forEach({ (type) in
             if !text.isEmpty {

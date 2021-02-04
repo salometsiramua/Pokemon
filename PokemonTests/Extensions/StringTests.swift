@@ -11,7 +11,7 @@ import XCTest
 class StringTests: XCTestCase {
  
     func testGetPokemonsIndexFromUrl() {
-        let url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/201.png"
+        let url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/201/"
         XCTAssertEqual(url.pokemonsIndex, "201")
     }
     
@@ -21,7 +21,7 @@ class StringTests: XCTestCase {
     }
     
     func testGetPokemonsIndexFromUrlBigNumber() {
-        let url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/299.png"
+        let url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/299/"
         XCTAssertEqual(url.pokemonsIndex, "299")
     }
 }

@@ -38,6 +38,27 @@ enum Constants {
             }
         }
     }
+    
+    enum Style {
+        case header
+        case title
+        case text
+        
+        var font: UIFont {
+            switch self {
+            case .header:
+                return .systemFont(ofSize: 20)
+            case .title:
+                return .systemFont(ofSize: 25)
+            case .text:
+                return .systemFont(ofSize: 18)
+            }
+        }
+        
+        var color: UIColor {
+            return Colors.title.value
+        }
+    }
 }
 
 
