@@ -13,7 +13,7 @@ protocol PokemonsDataSourceUpdatedListener {
     func setLoading(hidden: Bool)
 }
 
-class PokemonsListViewController: UIViewController {
+final class PokemonsListViewController: UIViewController {
     
     lazy var viewModel: PokemonsListViewModel = PokemonsListViewModelService()
     
@@ -26,6 +26,15 @@ class PokemonsListViewController: UIViewController {
         navigationController?.view.backgroundColor = .clear
         navigationController?.navigationBar.shadowImage = UIImage()
         
+        setupTitleView()
+        startIndicatingActivity()
+        setupBackgroundView()
+        setupTableView()
+        
+        view.bringSubviewToFront(indicator)
+    }
+    
+    private func setupTitleView() {
         let titleView = UIView()
         titleView.backgroundColor = .clear
         let titleImageView = UIImageView(image: UIImage(named: "logo"))
@@ -36,12 +45,6 @@ class PokemonsListViewController: UIViewController {
         titleImageView.widthAnchor.constraint(equalTo: titleImageView.heightAnchor, multiplier: 1024/377).isActive = true
         
         navigationItem.titleView = titleView
-        
-        startIndicatingActivity()
-        setupBackgroundView()
-        setupTableView()
-        
-        view.bringSubviewToFront(indicator)
     }
     
     private func setupBackgroundView() {
@@ -68,10 +71,6 @@ class PokemonsListViewController: UIViewController {
         tableView.backgroundColor = .clear
         viewModel.delegate = self
         viewModel.fetchPokemons()
-    }
-    
-    internal func showAlert(with error: Error) {
-        
     }
 }
 
@@ -121,8 +120,7 @@ extension PokemonsListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let pokemonDetailsViewController = PokemonsDetailsViewController()
-        pokemonDetailsViewController.viewModel = PokemonsDetailsViewModelService(url: viewModel.pokemons[indexPath.row].url)
+        let pokemonDetailsViewController = PokemonsDetailsViewController(viewModel: PokemonsDetailsViewModelService(url: viewModel.pokemons[indexPath.row].url))
         navigationController?.pushViewController(pokemonDetailsViewController, animated: true)
     }
 }

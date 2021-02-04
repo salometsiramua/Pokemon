@@ -26,5 +26,12 @@ class ViewControllerTests: XCTestCase {
         let vc = makeViewController()
         XCTAssertNotNil(vc.view)
     }
+    
+    func testPokemonsDetailsViewController() {
+        
+        let vc = PokemonsDetailsViewController()
+        XCTAssertTrue(vc is PokemonsDetailsViewController)
+        XCTAssertNotNil(vc.view)
+    }
 
 }

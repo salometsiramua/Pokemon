@@ -11,7 +11,7 @@ protocol MappableResponse {
     init(data: Data) throws
 }
 
-class ServiceManager<Response: MappableResponse> {
+final class ServiceManager<Response: MappableResponse> {
     
     private(set) var isRunning: Bool = false
     typealias ResponseObject = Response

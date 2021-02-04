@@ -8,10 +8,11 @@
 import UIKit
 
 extension UIViewController {
-    func showError(error: Error) {
+    func showAlert(with error: Error) {
         stopIndicatingActivity()
-        let alert = UIAlertController(title: "Error occured", message: error.localizedDescription, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "calcel", style: .default, handler: nil))
+        let message = (error as? NetworkError)?.description ?? error.localizedDescription
+        let alert = UIAlertController(title: "Error occured", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "cancel", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
     

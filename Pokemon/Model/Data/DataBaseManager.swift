@@ -8,14 +8,19 @@
 import UIKit
 import CoreData
 
+protocol DataBaseManager {
+    func save(results: [PokemonCellViewModel])
+    func fetchPokemonsList() -> [PokemonsListObject]?
+    func saveImage(for pokemonCellViewModel: PokemonCellViewModel)
+}
 
-class DataBaseManager {
+final class CoreDataManager: DataBaseManager {
     
-    static let sharedManager = DataBaseManager()
+    static let sharedManager = CoreDataManager()
     
     private init() {}
     
-    lazy var persistentContainer: NSPersistentContainer = {
+    private lazy var persistentContainer: NSPersistentContainer = {
         
         let container = NSPersistentContainer(name: "Pokemon")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
@@ -28,8 +33,8 @@ class DataBaseManager {
         return container
     }()
     
-    func saveContext () {
-        let context = DataBaseManager.sharedManager.persistentContainer.viewContext
+    private func saveContext () {
+        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
         
         if context.hasChanges {
@@ -43,7 +48,7 @@ class DataBaseManager {
     }
     
     func save(results: [PokemonCellViewModel]) {
-        let managedContext = DataBaseManager.sharedManager.persistentContainer.viewContext
+        let managedContext = CoreDataManager.sharedManager.persistentContainer.viewContext
         
         managedContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
         
@@ -73,7 +78,7 @@ class DataBaseManager {
     
     func fetchPokemonsList() -> [PokemonsListObject]?{
         
-        let managedContext = DataBaseManager.sharedManager.persistentContainer.viewContext
+        let managedContext = CoreDataManager.sharedManager.persistentContainer.viewContext
         
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "PokemonsListObject")
 
@@ -90,7 +95,7 @@ class DataBaseManager {
     
     func saveImage(for pokemonCellViewModel: PokemonCellViewModel) {
         
-        let managedContext = DataBaseManager.sharedManager.persistentContainer.viewContext
+        let managedContext = CoreDataManager.sharedManager.persistentContainer.viewContext
         managedContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "PokemonsListObject")
@@ -109,9 +114,5 @@ class DataBaseManager {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
     }
-    
-//    func savePokemon(pokemon: ) {
-//
-//    }
 }
 

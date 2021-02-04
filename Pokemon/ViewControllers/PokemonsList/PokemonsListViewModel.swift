@@ -22,7 +22,7 @@ protocol PokemonsListViewModel {
     func image(for indexPath: IndexPath, completion: @escaping (Result<ImageCache, Error>) -> Void)
 }
 
-class PokemonsListViewModelService: PokemonsListViewModel {
+final class PokemonsListViewModelService: PokemonsListViewModel {
     
     var delegate: PokemonsDataSourceUpdatedListener?
     
@@ -38,14 +38,17 @@ class PokemonsListViewModelService: PokemonsListViewModel {
     
     private let cache = NSCache<NSNumber, UIImage>()
     private let utilityQueue = DispatchQueue.global(qos: .utility)
+    private let dataBaseManager: DataBaseManager
     
-    init(pokemonsListFetcher: PokemonsListFetcher = PokemonsListFetcherService()) {
+    init(pokemonsListFetcher: PokemonsListFetcher = PokemonsListFetcherService(), dataBaseManager: DataBaseManager = CoreDataManager.sharedManager) {
         self.pokemonsListFetcher = pokemonsListFetcher
+        self.dataBaseManager = dataBaseManager
     }
     
     func fetchPokemons() {
         
         guard Reachability.isConnectedToNetwork else {
+            delegate?.showAlert(with: NetworkError.noInternetConnection)
             fetchFromCoreData()
             return
         }
@@ -126,15 +129,15 @@ class PokemonsListViewModelService: PokemonsListViewModel {
     }
     
     private func save(results: [PokemonCellViewModel]) {
-        DataBaseManager.sharedManager.save(results: results)
+        dataBaseManager.save(results: results)
     }
     
     private func saveImage(for model: PokemonCellViewModel) {
-        DataBaseManager.sharedManager.saveImage(for: model)
+        dataBaseManager.saveImage(for: model)
     }
     
     private func fetchFromCoreData() {
-        guard let list = DataBaseManager.sharedManager.fetchPokemonsList() else {
+        guard let list = dataBaseManager.fetchPokemonsList() else {
             return
         }
         

@@ -9,7 +9,7 @@ import UIKit
 
 protocol PokemonsDetailsUpdatedListener {
     func reload()
-    func showError(error: Error)
+    func showAlert(with error: Error)
     func appendImage(image: UIImage)
 }
 
@@ -18,22 +18,30 @@ enum DetailsScreenScrollViews: Int {
     case images
 }
 
-class PokemonsDetailsViewController: UIViewController {
+final class PokemonsDetailsViewController: UIViewController {
     
-    var viewModel: PokemonsDetailsViewModel?
+    var viewModel: PokemonsDetailsViewModel
     
-    private var name = UILabel(frame: .zero)
-    private var weight = UILabel(frame: .zero)
-    private var types = UILabel(frame: .zero)
+    private let name = UILabel(frame: .zero)
+    private let weight = UILabel(frame: .zero)
+    private let types = UILabel(frame: .zero)
     
-    private var mainScrollView = UIScrollView(frame: .zero)
-    private var verticalStackView = UIStackView(frame: .zero)
-    private var imagesContainerScrollView = UIScrollView(frame: .zero)
-    private var horizontalImagesStackView = UIStackView(frame: .zero)
+    private let mainScrollView = UIScrollView(frame: .zero)
+    private let verticalStackView = UIStackView(frame: .zero)
+    private let imagesContainerScrollView = UIScrollView(frame: .zero)
+    private let horizontalImagesStackView = UIStackView(frame: .zero)
     
-    private var statsStackView = UIStackView(frame: .zero)
+    private let statsStackView = UIStackView(frame: .zero)
+    private let pageControl = UIPageControl(frame: .zero)
     
-    private var pageControl = UIPageControl(frame: .zero)
+    init(viewModel: PokemonsDetailsViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         super.loadView()
@@ -42,7 +50,7 @@ class PokemonsDetailsViewController: UIViewController {
         setupImagesStack()
         setupComponents()
         
-        viewModel?.delegate = self
+        viewModel.delegate = self
         navigationController?.navigationBar.tintColor = .black
         
         startIndicatingActivity()
@@ -51,11 +59,11 @@ class PokemonsDetailsViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        guard viewModel?.pokemon == nil else {
+        guard viewModel.pokemon == nil else {
             return
         }
         
-        viewModel?.fetchDetails()
+        viewModel.fetchDetails()
     }
     
     private func setupMainView() {
@@ -170,13 +178,13 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
     func reload() {
         DispatchQueue.main.async {
             self.stopIndicatingActivity()
-            self.name.text = self.viewModel?.pokemon?.name.capitalized
+            self.name.text = self.viewModel.pokemon?.name.capitalized
             self.fillStatsStackView(with: self.viewModel)
             self.fillTypesStackView(with: self.viewModel)
         }
     }
     
-    func fillStatsStackView(with viewModel: PokemonsDetailsViewModel?) {
+    private func fillStatsStackView(with viewModel: PokemonsDetailsViewModel?) {
         viewModel?.pokemon?.stats.forEach({ (stat) in
             let stackView = UIStackView()
             stackView.axis = .vertical
@@ -204,7 +212,7 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
         })
     }
     
-    func fillTypesStackView(with viewModel: PokemonsDetailsViewModel?) {
+    private func fillTypesStackView(with viewModel: PokemonsDetailsViewModel?) {
         var text = ""
         viewModel?.pokemon?.types.forEach({ (type) in
             if !text.isEmpty {

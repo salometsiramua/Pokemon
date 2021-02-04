@@ -14,7 +14,7 @@ protocol PokemonsDetailsViewModel {
     func fetchDetails()
 }
 
-class PokemonsDetailsViewModelService: PokemonsDetailsViewModel {
+final class PokemonsDetailsViewModelService: PokemonsDetailsViewModel {
     
     var delegate: PokemonsDetailsUpdatedListener?
     var url: String?
@@ -39,7 +39,7 @@ class PokemonsDetailsViewModelService: PokemonsDetailsViewModel {
                 self?.loadImages(from: pokemon.allImages)
                 self?.delegate?.reload()
             case .failure(let error):
-                self?.delegate?.showError(error: error)
+                self?.delegate?.showAlert(with: error)
             }
         }
     }

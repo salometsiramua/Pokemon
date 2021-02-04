@@ -8,8 +8,8 @@
 import UIKit
 
 struct PokemonCellViewModel {
-    var name: String
-    var url: String
+    let name: String
+    let url: String
     var image: UIImage?
     
     init?(name: String?, url: String?, image: UIImage?) {

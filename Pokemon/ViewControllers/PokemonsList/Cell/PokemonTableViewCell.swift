@@ -11,12 +11,12 @@ protocol PokemonTableViewCellConfigurable {
     func configure(with viewmodel: PokemonCellViewModel?)
 }
 
-class PokemonTableViewCell: UITableViewCell {
+final class PokemonTableViewCell: UITableViewCell {
     
-    private var spinner = UIActivityIndicatorView(style: .gray)
-    private var stackView = UIStackView()
-    private var name = UILabel()
-    public var avatar = UIImageView()
+    private let spinner = UIActivityIndicatorView(style: .gray)
+    private let stackView = UIStackView()
+    private let name = UILabel()
+    public let avatar = UIImageView()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
