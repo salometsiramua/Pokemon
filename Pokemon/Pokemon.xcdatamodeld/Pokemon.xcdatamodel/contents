@@ -15,6 +15,11 @@
         <attribute name="name" attributeType="String"/>
         <attribute name="url" attributeType="String"/>
         <relationship name="pokemon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PokemonObject"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="url"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="StatObject" representedClassName="StatObject" syncable="YES" codeGenerationType="class"/>
     <entity name="TypeObject" representedClassName="TypeObject" syncable="YES" codeGenerationType="class">
