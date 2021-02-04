@@ -73,7 +73,10 @@ extension UIImageView {
 
 extension String {
     var pokemonsIndex: String? {
-        return components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        guard let index = split(separator: "/").last else {
+            return nil
+        }
+        return String(index)
     }
 }
 

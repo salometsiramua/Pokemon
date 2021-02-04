@@ -88,15 +88,16 @@ extension PokemonsListViewController: UITableViewDataSource {
         cell.backgroundColor = .clear
         cell.backgroundView = nil
         cell.selectionStyle = .none
-        
-        if isLoadingCell(for: indexPath) {
-            cell.configure(with: nil)
-        } else {
-            cell.configure(with: viewModel.pokemons[indexPath.row])
-        }
-        
         cell.tag = indexPath.row
         
+        guard !isLoadingCell(for: indexPath) else {
+            
+            cell.configure(with: nil)
+            return cell
+        }
+            
+        cell.configure(with: viewModel.pokemons[indexPath.row])
+            
         viewModel.image(for: indexPath) { [weak self] (result) in
             DispatchQueue.main.async {
                 switch result {

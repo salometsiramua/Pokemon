@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20C69" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BasicDataObject" representedClassName="BasicDataObject" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="PokemonObject" representedClassName="PokemonObject" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="types" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TypeObject"/>
+    </entity>
+    <entity name="StatObject" representedClassName="StatObject" syncable="YES" codeGenerationType="class"/>
+    <entity name="TypeObject" representedClassName="TypeObject" syncable="YES" codeGenerationType="class">
+        <attribute name="slot" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="type" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BasicDataObject"/>
+    </entity>
+    <elements>
+        <element name="PokemonObject" positionX="-63" positionY="-18" width="128" height="74"/>
+        <element name="TypeObject" positionX="-45" positionY="27" width="128" height="59"/>
+        <element name="BasicDataObject" positionX="-27" positionY="36" width="128" height="59"/>
+        <element name="StatObject" positionX="-9" positionY="63" width="128" height="29"/>
+    </elements>
 </model>
