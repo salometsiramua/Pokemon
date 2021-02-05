@@ -11,13 +11,22 @@ enum Constants {
     enum Colors {
         case background
         case title
+        case light
+        case appColor
+        case clear
         
         var value: UIColor {
             switch self {
             case .background:
                 return UIColor(named: "background") ?? .white
+            case .light:
+                return .lightGray
             case .title:
                 return UIColor(named: "title") ?? .black
+            case .appColor:
+                return .green
+            case .clear:
+                return .clear
             }
         }
     }

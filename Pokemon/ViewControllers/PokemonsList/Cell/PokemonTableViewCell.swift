@@ -33,15 +33,15 @@ final class PokemonTableViewCell: UITableViewCell {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(avatar)
         stackView.addArrangedSubview(name)
-        stackView.backgroundColor = .clear
+        stackView.backgroundColor = Constants.Colors.clear.value
         stackView.alignment = .center
         stackView.distribution = .equalSpacing
         stackView.spacing = Constants.Spacing.margin.value
         
         contentView.addSubview(stackView)
         contentView.addSubview(spinner)
-        contentView.backgroundColor = .clear
-        backgroundView?.backgroundColor = .clear
+        contentView.backgroundColor = Constants.Colors.clear.value
+        backgroundView?.backgroundColor = Constants.Colors.clear.value
         
         stackView.pin(to: contentView, directions: [.leading, .top, .bottom], edgeInsets: .init(top: 0, left: Constants.Spacing.margin.value, bottom: 0, right: Constants.Spacing.margin.value))
         

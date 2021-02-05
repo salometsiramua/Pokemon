@@ -23,7 +23,7 @@ final class PokemonsListViewController: UIViewController {
         super.loadView()
         
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.view.backgroundColor = .clear
+        navigationController?.view.backgroundColor = Constants.Colors.clear.value
         navigationController?.navigationBar.shadowImage = UIImage()
         
         setupTitleView()
@@ -36,7 +36,7 @@ final class PokemonsListViewController: UIViewController {
     
     private func setupTitleView() {
         let titleView = UIView()
-        titleView.backgroundColor = .clear
+        titleView.backgroundColor = Constants.Colors.clear.value
         let titleImageView = UIImageView(image: UIImage(named: "logo"))
         titleView.addSubview(titleImageView)
         titleImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -68,7 +68,7 @@ final class PokemonsListViewController: UIViewController {
         tableView.tableFooterView = UIView(frame: .zero)
         tableView.register(PokemonTableViewCell.self, forCellReuseIdentifier: PokemonTableViewCell.identifier)
         
-        tableView.backgroundColor = .clear
+        tableView.backgroundColor = Constants.Colors.clear.value
         viewModel.delegate = self
         viewModel.fetchPokemons()
     }
@@ -89,7 +89,7 @@ extension PokemonsListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        cell.backgroundColor = .clear
+        cell.backgroundColor = Constants.Colors.clear.value
         cell.backgroundView = nil
         cell.selectionStyle = .none
         cell.tag = indexPath.row

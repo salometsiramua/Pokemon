@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 class HorizontalProgressBar: UIView {
-    var color: UIColor = .gray {
+    var color: UIColor = Constants.Colors.light.value {
         didSet { setNeedsDisplay() }
     }
 

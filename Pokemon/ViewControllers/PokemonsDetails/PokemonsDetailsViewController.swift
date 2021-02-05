@@ -51,7 +51,7 @@ final class PokemonsDetailsViewController: UIViewController {
         setupComponents()
         
         viewModel.delegate = self
-        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.tintColor = Constants.Colors.title.value
         
         startIndicatingActivity()
     }
@@ -118,9 +118,9 @@ final class PokemonsDetailsViewController: UIViewController {
         
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         pageControl.currentPage = 0
-        pageControl.tintColor = .gray
-        pageControl.pageIndicatorTintColor = .lightGray
-        pageControl.currentPageIndicatorTintColor = .green
+        pageControl.tintColor = Constants.Colors.light.value
+        pageControl.pageIndicatorTintColor = Constants.Colors.light.value
+        pageControl.currentPageIndicatorTintColor = Constants.Colors.appColor.value
         
         verticalStackView.addArrangedSubview(pageControl)
         verticalStackView.addArrangedSubview(name)
@@ -201,8 +201,8 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
             progressBar.translatesAutoresizingMaskIntoConstraints = false
             progressBar.heightAnchor.constraint(equalToConstant: 10).isActive = true
             progressBar.widthAnchor.constraint(equalToConstant: view.frame.width * 0.8).isActive = true
-            progressBar.color = .green
-            progressBar.backgroundColor = .white
+            progressBar.color = Constants.Colors.appColor.value
+            progressBar.backgroundColor = Constants.Colors.background.value
             progressBar.progress = CGFloat(stat.effort)/CGFloat(stat.baseStat)
             
             title.textAlignment = .left
