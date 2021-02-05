@@ -11,14 +11,34 @@ import XCTest
 class PokemonsDetailsViewModelTests: XCTestCase {
     
     func testPokemonsDetailsViewModel() {
-        let model: PokemonsDetailsViewModel = PokemonsDetailsViewModelService(pokemonsDetailsFetcher: PokemonsDetailsFetcherMock(success: true), url: nil)
+        let model: PokemonsDetailsViewModel = PokemonsDetailsViewModelService(pokemonsDetailsFetcher: PokemonsDetailsFetcherMock(success: true), url: "https://pokeapi.co/api/v2/pokemon/212/")
         
         model.fetchDetails()
         
+        let exp = expectation(description: "Fetching pokemon")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            XCTAssertNotNil(model.pokemon)
+            XCTAssertEqual(model.pokemon?.weight, 43)
+            exp.fulfill()
+        }
+        
+        waitForExpectations(timeout: 1)
     }
     
     func testPokemonsDetailsViewModelReturningFailure() {
+        let model: PokemonsDetailsViewModel = PokemonsDetailsViewModelService(pokemonsDetailsFetcher: PokemonsDetailsFetcherMock(success: false), url: nil)
         
+        model.fetchDetails()
+        
+        let exp = expectation(description: "Fetching pokemon")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            XCTAssertNil(model.pokemon)
+            exp.fulfill()
+        }
+        
+        waitForExpectations(timeout: 2.0)
     }
 }
 

@@ -29,7 +29,7 @@ class ViewControllerTests: XCTestCase {
     
     func testPokemonsDetailsViewController() {
         
-        let vc = PokemonsDetailsViewController()
+        let vc = PokemonsDetailsViewController(viewModel: PokemonsDetailsViewModelService(url: nil))
         XCTAssertTrue(vc is PokemonsDetailsViewController)
         XCTAssertNotNil(vc.view)
     }

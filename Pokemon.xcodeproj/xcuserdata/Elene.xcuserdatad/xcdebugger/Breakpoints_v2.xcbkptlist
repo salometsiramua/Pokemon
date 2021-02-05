@@ -536,7 +536,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "ABBEA1B1-50ED-495D-9277-55CBC0FC8755"
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Pokemon/ViewControllers/PokemonsDetails/PokemonsDetailsViewModel.swift"
@@ -560,7 +560,7 @@
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "35"
                   endingLineNumber = "35"
-                  offsetFromSymbolStart = "135">
+                  offsetFromSymbolStart = "241">
                </Location>
                <Location
                   uuid = "ABBEA1B1-50ED-495D-9277-55CBC0FC8755 - 468451f95e81d4b2"
@@ -600,7 +600,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "C4A8CA48-3DA5-4833-9BD1-D0524383CEC6"
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Pokemon/ViewControllers/PokemonsDetails/PokemonsDetailsViewModel.swift"
@@ -610,53 +610,6 @@
             endingLineNumber = "36"
             landmarkName = "fetchDetails()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "C4A8CA48-3DA5-4833-9BD1-D0524383CEC6 - 468451f95e81d4f0"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;Pokemon.Pokemon, Swift.Error&gt;) -&gt; () in Pokemon.PokemonsDetailsViewModelService.fetchDetails() -&gt; ()"
-                  moduleName = "Pokemon"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/Elene/Salome/Pokemon/Pokemon/ViewControllers/PokemonsDetails/PokemonsDetailsViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "37"
-                  endingLineNumber = "37"
-                  offsetFromSymbolStart = "165">
-               </Location>
-               <Location
-                  uuid = "C4A8CA48-3DA5-4833-9BD1-D0524383CEC6 - 468451f95e81d4f0"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;Pokemon.Pokemon, Swift.Error&gt;) -&gt; () in Pokemon.PokemonsDetailsViewModelService.fetchDetails() -&gt; ()"
-                  moduleName = "Pokemon"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/Elene/Salome/Pokemon/Pokemon/ViewControllers/PokemonsDetails/PokemonsDetailsViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "37"
-                  endingLineNumber = "37"
-                  offsetFromSymbolStart = "200">
-               </Location>
-               <Location
-                  uuid = "C4A8CA48-3DA5-4833-9BD1-D0524383CEC6 - 468451f95e81d4f0"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;Pokemon.Pokemon, Swift.Error&gt;) -&gt; () in Pokemon.PokemonsDetailsViewModelService.fetchDetails() -&gt; ()"
-                  moduleName = "Pokemon"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/Elene/Salome/Pokemon/Pokemon/ViewControllers/PokemonsDetails/PokemonsDetailsViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "37"
-                  endingLineNumber = "37"
-                  offsetFromSymbolStart = "2350">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1279,6 +1232,22 @@
             startingLineNumber = "114"
             endingLineNumber = "114"
             landmarkName = "saveImage(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "CC1817EA-D02D-4322-B9A0-02181A42E61F"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Pokemon/ViewControllers/PokemonsDetails/PokemonsDetailsViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "fetchDetails()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
