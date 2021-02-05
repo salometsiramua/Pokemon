@@ -15,3 +15,9 @@ UI is from code.
 Application supports offline mode partially. (List is being saved, pokemon details not)
 
 Styles, Colors, Fonts are centralized.
+
+
+P.S.
+
+Service for the list of pokemons did not have image url inside, so I did a small workaround and generated the ULR from image index.
+(Currently it's working but I also understand that if image path will be changed it will break this solution)
