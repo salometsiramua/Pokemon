@@ -8,40 +8,77 @@
 import UIKit
 import CoreData
 
-struct ImageCache {
-    var image: UIImage
-    var index: Int
-}
-
 protocol PokemonsListViewModel {
     
     var totalCount: Int { get }
     var pokemons: [Int: PokemonCellViewModel] { get }
     var delegate: PokemonsDataSourceUpdatedListener? { get set }
     func fetchPokemons(for indexes: [Int])
-    func image(for indexPath: IndexPath, completion: @escaping (Result<ImageCache, Error>) -> Void)
+    func suspendAllOperations()
+    func resumeAllOperations()
+    func image(for cell: IndexPath)
+    func images(for cells: [IndexPath]?)
 }
 
 final class PokemonsListViewModelService: PokemonsListViewModel {
     
     var delegate: PokemonsDataSourceUpdatedListener?
-    
     var totalCount: Int = 0
     private var downloadedCount: Int = 0
     private var next: String?
     private var previous: String?
     private let batchSize = 20
     private(set) var pokemons: [Int: PokemonCellViewModel] = [:]
+    private let pendingOperations = PendingOperations()
     
     private var pokemonsListFetcher: PokemonsListFetcher
-    
-    private let cache = NSCache<NSNumber, UIImage>()
-    private let utilityQueue = DispatchQueue.global(qos: .utility)
     private let dataBaseManager: DataBaseManager
     
     init(pokemonsListFetcher: PokemonsListFetcher = PokemonsListFetcherService(), dataBaseManager: DataBaseManager = CoreDataManager.sharedManager) {
         self.pokemonsListFetcher = pokemonsListFetcher
         self.dataBaseManager = dataBaseManager
+    }
+    
+    func image(for cell: IndexPath) {
+        guard let model = pokemons[cell.row], model.image.state == .new else {
+            return
+        }
+        
+        startDownload(for: model.image, at: cell)
+    }
+    
+    func images(for cells: [IndexPath]?) {
+        
+        guard let cells = cells else { return }
+        
+        let allPendingOperations = Set(pendingOperations.downloadsInProgress.keys)
+        
+        var toBeCancelled = allPendingOperations
+        let visiblePaths = Set(cells)
+        toBeCancelled.subtract(visiblePaths)
+        
+        var toBeStarted = visiblePaths
+        toBeStarted.subtract(allPendingOperations)
+        
+        toBeCancelled.forEach { (indexPath) in
+            if let pendingDownload = pendingOperations.downloadsInProgress[indexPath] {
+                pendingDownload.cancel()
+            }
+            pendingOperations.downloadsInProgress.removeValue(forKey: indexPath)
+        }
+        
+        toBeStarted.filter{ pokemons[$0.row]?.image.state == ImageState.new}.forEach { (indexPath) in
+            guard let image = pokemons[indexPath.row]?.image else { return }
+            startDownload(for: image, at: indexPath)
+        }
+    }
+    
+    func suspendAllOperations() {
+        pendingOperations.downloadQueue.isSuspended = true
+    }
+    
+    func resumeAllOperations() {
+        pendingOperations.downloadQueue.isSuspended = false
     }
     
     func fetchPokemons(for indexes: [Int]) {
@@ -61,14 +98,16 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
                 self.totalCount = pokemonsList.count
                 self.next = pokemonsList.next
                 self.previous = pokemonsList.previous
-                let pokemons = pokemonsList.results.compactMap { PokemonCellViewModel(name: $0.name, url: $0.url, image: nil)}
+                let pokemons = pokemonsList.results.compactMap { PokemonCellViewModel(name: $0.name, url: $0.url, image: Image(url: self.imageUrl(for: $0.url)))}
                 
                 let batchStartIndex = self.batchStartIndex(from: pokemonsList.previous, nextUrl: pokemonsList.next)
                 pokemons.enumerated().forEach { (index, model) in
-                    self.pokemons[batchStartIndex + index] = model
+                    let itemIndex = batchStartIndex + index
+                    self.pokemons[itemIndex] = model
                 }
+                
                 self.delegate?.reloadTable(rows: self.indexPathsToReload(from: pokemonsList.results))
-               // self.save(results: pokemons)
+            // self.save(results: pokemons)
             case .failure(let error):
                 self.delegate?.showAlert(with: error)
             }
@@ -102,32 +141,33 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
         return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
     }
     
-    func image(for indexPath: IndexPath, completion: @escaping (Result<ImageCache, Error>) -> Void) {
-        let itemNumber = NSNumber(value: indexPath.item)
-        if let cachedImage = self.cache.object(forKey: itemNumber) {
-            completion(.success(ImageCache(image: cachedImage, index: indexPath.row)))
+    func startDownload(for photoRecord: Image, at indexPath: IndexPath) {
+
+        guard pendingOperations.downloadsInProgress[indexPath] == nil, pokemons[indexPath.row]?.image.state == ImageState.new else {
             return
         }
         
-        guard let url = pokemons[indexPath.row]?.url else {
-            completion(.failure(NetworkError.urlIsInvalid))
-            return
-        }
+        let downloader = ImageDownloader(photoRecord, indexPath: indexPath)
         
-        guard let imageUrl = imageUrl(for: url) else {
-            completion(.failure(NetworkError.urlIsInvalid))
-            return
-        }
-        
-        self.loadImage(url: imageUrl) { [weak self] (image) in
-            guard let self = self, let image = image else { return }
+        downloader.completionBlock = {
+            if downloader.isCancelled {
+                return
+            }
             
-            completion(.success(ImageCache(image: image, index: indexPath.row)))
-            self.pokemons[indexPath.row]?.image = image
-            self.cache.setObject(image, forKey: itemNumber)
-            guard let model = self.pokemons[indexPath.row] else { return }
-            self.saveImage(for: model)
+            
+            
+//            guard let model = self.pokemons[indexPath.row] else { return }
+//            self.saveImage(for: model)
+            
+            DispatchQueue.main.async {
+                self.pokemons[indexPath.row]?.image = downloader.image
+                self.pendingOperations.downloadsInProgress.removeValue(forKey: downloader.indexPath)
+                self.delegate?.reloadTable(rows: [downloader.indexPath])
+            }
         }
+        
+        pendingOperations.downloadsInProgress[indexPath] = downloader
+        pendingOperations.downloadQueue.addOperation(downloader)
     }
     
     private func imageUrl(for url: String) -> String? {
@@ -137,16 +177,6 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
         }
         
         return imageURL
-    }
-    
-    private func loadImage(url: String, completion: @escaping (UIImage?) -> ()) {
-        utilityQueue.async {
-            guard let unwrappedUrl = URL(string: url), let data = try? Data(contentsOf: unwrappedUrl) else { return }
-            
-            DispatchQueue.main.async {
-                completion(UIImage(data: data))
-            }
-        }
     }
     
     private func save(results: [PokemonCellViewModel]) {
@@ -164,7 +194,9 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
         
         pokemons = [:]
         list.enumerated().forEach { (index, element) in
-            pokemons[index] = PokemonCellViewModel(name: element.name, url: element.url, image: element.image == nil ? nil : UIImage(data: element.image!))
+            let image = element.image == nil ? nil : UIImage(data: element.image!)
+            guard let url = element.url else { return }
+            pokemons[index] = PokemonCellViewModel(name: element.name, url: url, image: Image(url: imageUrl(for: url), image: image))
         }
         
         totalCount = pokemons.count

@@ -10,7 +10,6 @@ import UIKit
 protocol PokemonsDataSourceUpdatedListener {
     func reloadTable(rows: [IndexPath])
     func showAlert(with error: Error)
-    func setLoading(hidden: Bool)
 }
 
 final class PokemonsListViewController: UIViewController {
@@ -71,6 +70,7 @@ final class PokemonsListViewController: UIViewController {
         tableView.backgroundColor = Constants.Colors.clear.value
         viewModel.delegate = self
         viewModel.fetchPokemons(for: [0])
+        viewModel.images(for: tableView.indexPathsForVisibleRows)
     }
 }
 
@@ -95,35 +95,33 @@ extension PokemonsListViewController: UITableViewDataSource {
         cell.tag = indexPath.row
         
         guard !isLoadingCell(for: indexPath) else {
-
+            
             cell.configure(with: nil)
             return cell
         }
-            
+        
         cell.configure(with: viewModel.pokemons[indexPath.row])
-            
-//        viewModel.image(for: indexPath) { [weak self] (result) in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let imageCache):
-//                    guard cell.tag == imageCache.index else {
-//                        return
-//                    }
-//                    cell.avatar.image = imageCache.image
-//                case .failure(let error):
-//                    self?.showAlert(with: error)
-//                }
-//            }
-//        }
+        viewModel.image(for: indexPath)
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        viewModel.suspendAllOperations()
     }
     
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            viewModel.images(for: tableView.indexPathsForVisibleRows)
+            viewModel.resumeAllOperations()
+        }
+    }
     
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        viewModel.images(for: tableView.indexPathsForVisibleRows)
+        viewModel.resumeAllOperations()
+    }
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let pokemonDetailsViewController = PokemonsDetailsViewController(viewModel: PokemonsDetailsViewModelService(url: viewModel.pokemons[indexPath.row]?.url))
         navigationController?.pushViewController(pokemonDetailsViewController, animated: true)
@@ -148,6 +146,7 @@ extension PokemonsListViewController: UITableViewDataSourcePrefetching {
     }
 }
 
+
 extension PokemonsListViewController: PokemonsDataSourceUpdatedListener {
     
     func reloadTable(rows: [IndexPath] = []) {
@@ -163,11 +162,6 @@ extension PokemonsListViewController: PokemonsDataSourceUpdatedListener {
                 return
             }
             self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
-
         }
-    }
-    
-    func setLoading(hidden: Bool) {
-        
     }
 }

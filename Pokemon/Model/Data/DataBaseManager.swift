@@ -60,9 +60,9 @@ final class CoreDataManager: DataBaseManager {
             let pokemonsListObject = PokemonsListObject(entity: entity, insertInto: managedContext)
             
             pokemonsListObject.name = model.name
-            pokemonsListObject.url = model.url
+            pokemonsListObject.url = model.image.url
             
-            if let image = model.image {
+            if let image = model.image.image {
                 let data = image.pngData()
                 pokemonsListObject.image = data
             }
@@ -107,7 +107,7 @@ final class CoreDataManager: DataBaseManager {
             
             guard let object = pokemonsList.first as? PokemonsListObject else { return }
 
-            object.image = pokemonCellViewModel.image?.pngData()
+            object.image = pokemonCellViewModel.image.image?.pngData()
             try managedContext.save()
             
         } catch let error as NSError {

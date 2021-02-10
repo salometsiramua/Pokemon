@@ -5,15 +5,15 @@
 //  Created by Salome Tsiramua on 2/2/21.
 //
 
-import UIKit
+import Foundation
 
 struct PokemonCellViewModel {
     let name: String
     let url: String
-    var image: UIImage?
+    var image: Image
     
-    init?(name: String?, url: String?, image: UIImage?) {
-        guard let name = name, let url = url else {
+    init?(name: String?, url: String, image: Image) {
+        guard let name = name else {
             return nil
         }
         self.name = name

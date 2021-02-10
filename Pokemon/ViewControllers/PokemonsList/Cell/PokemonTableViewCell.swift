@@ -69,6 +69,6 @@ extension PokemonTableViewCell: PokemonTableViewCellConfigurable {
             spinner.stopAnimating()
         }
         
-        avatar.image = viewModel?.image ?? UIImage(named: "placeholder")
+        avatar.image = viewModel?.image.image ?? UIImage(named: "placeholder")
     }
 }

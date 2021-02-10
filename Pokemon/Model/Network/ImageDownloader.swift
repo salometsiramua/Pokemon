@@ -5,7 +5,7 @@
 //  Created by Salome Tsiramua on 2/2/21.
 //
 
-import Foundation
+import UIKit
 
 enum ImagePath {
     case backDefault
@@ -51,13 +51,54 @@ enum ImagePath {
     }
 }
 
-protocol ImageDownloader {
-    func download(for Index: String)
+class PendingOperations {
+    lazy var downloadsInProgress: [IndexPath: Operation] = [:]
+    lazy var downloadQueue: OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "Download queue"
+        queue.maxConcurrentOperationCount = 5
+        return queue
+    }()
 }
 
-class ImageDownloaderService: ImageDownloader {
+enum ImageState {
+    case new
+    case downloaded
+    case failed
+}
+
+class Image {
+    let url: String?
+    var state = ImageState.new
+    var image: UIImage?
     
-    func download(for index: String) {
+    init(url: String?, image: UIImage? = nil) {
+        self.url = url
+        self.image = image
+    }
+}
+
+class ImageDownloader: Operation {
+    
+    let image: Image
+    let indexPath: IndexPath
+    
+    init(_ image: Image, indexPath: IndexPath) {
+        self.image = image
+        self.indexPath = indexPath
+    }
+    
+    override func main() {
+        guard !isCancelled else {
+            return
+        }
         
+        guard let url = image.url, let imageUrl = URL(string: url), let imageData = try? Data(contentsOf: imageUrl) else {
+            image.state = .failed
+            return
+        }
+        
+        image.image = imageData.isEmpty ? nil : UIImage(data: imageData)
+        image.state = image.image == nil ? .failed : .downloaded
     }
 }
