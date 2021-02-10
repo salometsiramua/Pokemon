@@ -23,11 +23,8 @@ protocol PokemonsListViewModel {
 final class PokemonsListViewModelService: PokemonsListViewModel {
     
     var delegate: PokemonsDataSourceUpdatedListener?
-    var totalCount: Int = 0
-    private var downloadedCount: Int = 0
-    private var next: String?
-    private var previous: String?
     private let batchSize = 20
+    private(set) var totalCount: Int = 0
     private(set) var pokemons: [Int: PokemonCellViewModel] = [:]
     private let pendingOperations = PendingOperations()
     
@@ -96,8 +93,6 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
             switch response {
             case .success(let pokemonsList):
                 self.totalCount = pokemonsList.count
-                self.next = pokemonsList.next
-                self.previous = pokemonsList.previous
                 let pokemons = pokemonsList.results.compactMap { PokemonCellViewModel(name: $0.name, url: $0.url, image: Image(url: self.imageUrl(for: $0.url)))}
                 
                 let batchStartIndex = self.batchStartIndex(from: pokemonsList.previous, nextUrl: pokemonsList.next)
@@ -107,7 +102,7 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
                 }
                 
                 self.delegate?.reloadTable(rows: self.indexPathsToReload(from: pokemonsList.results))
-            // self.save(results: pokemons)
+                self.save(results: pokemons)
             case .failure(let error):
                 self.delegate?.showAlert(with: error)
             }
@@ -121,7 +116,7 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
     private func batchStartIndex(from previousUrl: String?, nextUrl: String?) -> Int {
         
         guard let offset = offsetFromUrl(string: previousUrl) else {
-            return (offsetFromUrl(string: next) ?? batchSize) - batchSize
+            return (offsetFromUrl(string: nextUrl) ?? batchSize) - batchSize
         }
         
         return offset + batchSize
@@ -154,16 +149,14 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
                 return
             }
             
-            
-            
-//            guard let model = self.pokemons[indexPath.row] else { return }
-//            self.saveImage(for: model)
-            
             DispatchQueue.main.async {
                 self.pokemons[indexPath.row]?.image = downloader.image
+                guard let model = self.pokemons[indexPath.row] else { return }
+                self.saveImage(for: model)
                 self.pendingOperations.downloadsInProgress.removeValue(forKey: downloader.indexPath)
                 self.delegate?.reloadTable(rows: [downloader.indexPath])
             }
+            
         }
         
         pendingOperations.downloadsInProgress[indexPath] = downloader

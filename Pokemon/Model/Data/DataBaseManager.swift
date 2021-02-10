@@ -18,6 +18,13 @@ final class CoreDataManager: DataBaseManager {
     
     static let sharedManager = CoreDataManager()
     
+    lazy var backgroundContext: NSManagedObjectContext = {
+        let newbackgroundContext = persistentContainer.newBackgroundContext()
+        newbackgroundContext.automaticallyMergesChangesFromParent = true
+        newbackgroundContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
+        return newbackgroundContext
+    }()
+    
     private init() {}
     
     private lazy var persistentContainer: NSPersistentContainer = {
@@ -33,34 +40,17 @@ final class CoreDataManager: DataBaseManager {
         return container
     }()
     
-    private func saveContext () {
-        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
-        context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
-        
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                let nserror = error as NSError
-                print("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
-        }
-    }
-    
     func save(results: [PokemonCellViewModel]) {
-        let managedContext = CoreDataManager.sharedManager.persistentContainer.viewContext
         
-        managedContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
-        
-        guard let entity = NSEntityDescription.entity(forEntityName: "PokemonsListObject", in: managedContext) else {
+        guard let entity = NSEntityDescription.entity(forEntityName: "PokemonsListObject", in: backgroundContext) else {
             return
         }
         
         results.forEach { (model) in
-            let pokemonsListObject = PokemonsListObject(entity: entity, insertInto: managedContext)
+            let pokemonsListObject = PokemonsListObject(entity: entity, insertInto: backgroundContext)
             
             pokemonsListObject.name = model.name
-            pokemonsListObject.url = model.image.url
+            pokemonsListObject.url = model.url
             
             if let image = model.image.image {
                 let data = image.pngData()
@@ -68,20 +58,19 @@ final class CoreDataManager: DataBaseManager {
             }
         }
         
-        do {
-            try managedContext.save()
-            
-        } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
+        backgroundContext.performAndWait {
+            do {
+                try backgroundContext.save()
+            } catch {
+                fatalError("Failure to save context: \(error)")
+            }
         }
     }
     
     func fetchPokemonsList() -> [PokemonsListObject]?{
         
         let managedContext = CoreDataManager.sharedManager.persistentContainer.viewContext
-        
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "PokemonsListObject")
-
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "url", ascending: true)]
         
         do {
@@ -95,24 +84,20 @@ final class CoreDataManager: DataBaseManager {
     
     func saveImage(for pokemonCellViewModel: PokemonCellViewModel) {
         
-        let managedContext = CoreDataManager.sharedManager.persistentContainer.viewContext
-        managedContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-        
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "PokemonsListObject")
-        
         fetchRequest.predicate = NSPredicate(format: "url = %@", pokemonCellViewModel.url)
 
         do {
-            let pokemonsList = try managedContext.fetch(fetchRequest)
-            
+            let pokemonsList = try backgroundContext.fetch(fetchRequest)
             guard let object = pokemonsList.first as? PokemonsListObject else { return }
-
             object.image = pokemonCellViewModel.image.image?.pngData()
-            try managedContext.save()
+            
+            try backgroundContext.save()
             
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
+        
     }
 }
 
