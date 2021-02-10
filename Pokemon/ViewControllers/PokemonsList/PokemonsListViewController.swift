@@ -70,7 +70,7 @@ final class PokemonsListViewController: UIViewController {
         
         tableView.backgroundColor = Constants.Colors.clear.value
         viewModel.delegate = self
-        viewModel.fetchPokemons()
+        viewModel.fetchPokemons(for: [0])
     }
 }
 
@@ -95,32 +95,37 @@ extension PokemonsListViewController: UITableViewDataSource {
         cell.tag = indexPath.row
         
         guard !isLoadingCell(for: indexPath) else {
-            
+
             cell.configure(with: nil)
             return cell
         }
             
         cell.configure(with: viewModel.pokemons[indexPath.row])
             
-        viewModel.image(for: indexPath) { [weak self] (result) in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let imageCache):
-                    guard cell.tag == imageCache.index else {
-                        return
-                    }
-                    cell.avatar.image = imageCache.image
-                case .failure(let error):
-                    self?.showAlert(with: error)
-                }
-            }
-        }
+//        viewModel.image(for: indexPath) { [weak self] (result) in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let imageCache):
+//                    guard cell.tag == imageCache.index else {
+//                        return
+//                    }
+//                    cell.avatar.image = imageCache.image
+//                case .failure(let error):
+//                    self?.showAlert(with: error)
+//                }
+//            }
+//        }
         
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+    }
+    
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let pokemonDetailsViewController = PokemonsDetailsViewController(viewModel: PokemonsDetailsViewModelService(url: viewModel.pokemons[indexPath.row].url))
+        let pokemonDetailsViewController = PokemonsDetailsViewController(viewModel: PokemonsDetailsViewModelService(url: viewModel.pokemons[indexPath.row]?.url))
         navigationController?.pushViewController(pokemonDetailsViewController, animated: true)
     }
 }
@@ -128,12 +133,12 @@ extension PokemonsListViewController: UITableViewDataSource {
 extension PokemonsListViewController: UITableViewDataSourcePrefetching {
     func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
         if indexPaths.contains(where: isLoadingCell) {
-            viewModel.fetchPokemons()
+            viewModel.fetchPokemons(for: indexPaths.map {$0.row })
         }
     }
     
     private func isLoadingCell(for indexPath: IndexPath) -> Bool {
-        return indexPath.row >= viewModel.pokemons.count
+        return viewModel.pokemons[indexPath.row] == nil
     }
     
     private func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
@@ -158,7 +163,7 @@ extension PokemonsListViewController: PokemonsDataSourceUpdatedListener {
                 return
             }
             self.tableView.reloadRows(at: indexPathsToReload, with: .automatic)
-            
+
         }
     }
     

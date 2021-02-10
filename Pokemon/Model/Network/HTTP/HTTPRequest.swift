@@ -32,5 +32,9 @@ class HTTPSession: HTTPRequestSession {
         })
         dataTask?.resume()
     }
+    
+    func cancel() {
+        dataTask?.cancel()
+    }
 
 }

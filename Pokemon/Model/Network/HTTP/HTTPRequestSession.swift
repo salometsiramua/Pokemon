@@ -11,4 +11,5 @@ public typealias HTTPRequestSessionCompletion = (_ data: Data?, _ response: URLR
 
 protocol HTTPRequestSession: class {
     func request(_ request: HTTPRequest, completion: @escaping HTTPRequestSessionCompletion)
+    func cancel()
 }

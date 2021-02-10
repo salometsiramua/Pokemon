@@ -18,7 +18,7 @@ final class ServiceManager<Response: MappableResponse> {
     
     private let service: Endpoint
     private let session: NetworkSession
-    private let httpService: HTTPRequestSession
+    public let httpService: HTTPRequestSession
     
     private var onSuccessCallback: ServiceSuccessCallback?
     private var onFailureCallback: ServiceFailureCallback?

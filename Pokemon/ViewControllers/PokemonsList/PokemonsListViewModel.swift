@@ -16,9 +16,9 @@ struct ImageCache {
 protocol PokemonsListViewModel {
     
     var totalCount: Int { get }
-    var pokemons: [PokemonCellViewModel] { get }
+    var pokemons: [Int: PokemonCellViewModel] { get }
     var delegate: PokemonsDataSourceUpdatedListener? { get set }
-    func fetchPokemons()
+    func fetchPokemons(for indexes: [Int])
     func image(for indexPath: IndexPath, completion: @escaping (Result<ImageCache, Error>) -> Void)
 }
 
@@ -30,11 +30,10 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
     private var downloadedCount: Int = 0
     private var next: String?
     private var previous: String?
-    private var isFetching: Bool = false
+    private let batchSize = 20
+    private(set) var pokemons: [Int: PokemonCellViewModel] = [:]
     
-    private(set) var pokemons: [PokemonCellViewModel] = []
-    
-    private let pokemonsListFetcher: PokemonsListFetcher
+    private var pokemonsListFetcher: PokemonsListFetcher
     
     private let cache = NSCache<NSNumber, UIImage>()
     private let utilityQueue = DispatchQueue.global(qos: .utility)
@@ -45,7 +44,7 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
         self.dataBaseManager = dataBaseManager
     }
     
-    func fetchPokemons() {
+    func fetchPokemons(for indexes: [Int]) {
         
         guard Reachability.isConnectedToNetwork else {
             delegate?.showAlert(with: NetworkError.noInternetConnection)
@@ -53,26 +52,48 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
             return
         }
         
-        guard !isFetching else { return }
+        let skip = batchStartIndex(for: indexes.last ?? 0)
         
-        isFetching = true
-        pokemonsListFetcher.fetch(url: next) { [weak self] (response) in
+        pokemonsListFetcher.fetch(take: batchSize, skip: skip){ [weak self] (response) in
             guard let self = self else { return }
             switch response {
             case .success(let pokemonsList):
-                self.isFetching = false
                 self.totalCount = pokemonsList.count
                 self.next = pokemonsList.next
                 self.previous = pokemonsList.previous
                 let pokemons = pokemonsList.results.compactMap { PokemonCellViewModel(name: $0.name, url: $0.url, image: nil)}
-                self.pokemons.append(contentsOf: pokemons)
+                
+                let batchStartIndex = self.batchStartIndex(from: pokemonsList.previous, nextUrl: pokemonsList.next)
+                pokemons.enumerated().forEach { (index, model) in
+                    self.pokemons[batchStartIndex + index] = model
+                }
                 self.delegate?.reloadTable(rows: self.indexPathsToReload(from: pokemonsList.results))
-                self.save(results: pokemons)
+               // self.save(results: pokemons)
             case .failure(let error):
-                self.isFetching = false
                 self.delegate?.showAlert(with: error)
             }
         }
+    }
+    
+    private func batchStartIndex(for index: Int) -> Int {
+        return index - (index % batchSize)
+    }
+    
+    private func batchStartIndex(from previousUrl: String?, nextUrl: String?) -> Int {
+        
+        guard let offset = offsetFromUrl(string: previousUrl) else {
+            return (offsetFromUrl(string: next) ?? batchSize) - batchSize
+        }
+        
+        return offset + batchSize
+    }
+    
+    private func offsetFromUrl(string: String?) -> Int? {
+        guard let string = string else { return nil }
+        guard let start = string.range(of: "offset=")?.upperBound, let end = string.range(of: "&limit")?.lowerBound else {
+            return nil
+        }
+        return Int(string[start..<end]) ??  0
     }
     
     private func indexPathsToReload(from result: [PokemonsBasicData]) -> [IndexPath] {
@@ -88,11 +109,10 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
             return
         }
         
-        guard indexPath.row < pokemons.count else {
+        guard let url = pokemons[indexPath.row]?.url else {
+            completion(.failure(NetworkError.urlIsInvalid))
             return
         }
-        
-        let url = pokemons[indexPath.row].url
         
         guard let imageUrl = imageUrl(for: url) else {
             completion(.failure(NetworkError.urlIsInvalid))
@@ -103,9 +123,10 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
             guard let self = self, let image = image else { return }
             
             completion(.success(ImageCache(image: image, index: indexPath.row)))
-            self.pokemons[indexPath.row].image = image
+            self.pokemons[indexPath.row]?.image = image
             self.cache.setObject(image, forKey: itemNumber)
-            self.saveImage(for: self.pokemons[indexPath.row])
+            guard let model = self.pokemons[indexPath.row] else { return }
+            self.saveImage(for: model)
         }
     }
     
@@ -141,8 +162,11 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
             return
         }
         
-        pokemons = list.compactMap { PokemonCellViewModel(name: $0.name, url: $0.url, image: $0.image == nil ? nil : UIImage(data: $0.image!))
+        pokemons = [:]
+        list.enumerated().forEach { (index, element) in
+            pokemons[index] = PokemonCellViewModel(name: element.name, url: element.url, image: element.image == nil ? nil : UIImage(data: element.image!))
         }
+        
         totalCount = pokemons.count
         
         delegate?.reloadTable(rows: [])

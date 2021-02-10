@@ -13,9 +13,5 @@ class HTTPMethodTests: XCTestCase {
     func testRawValues() {
       
         XCTAssertEqual(HTTPMethod.get.rawValue, "GET")
-        XCTAssertEqual(HTTPMethod.post.rawValue, "POST")
-        XCTAssertEqual(HTTPMethod.put.rawValue, "PUT")
-        XCTAssertEqual(HTTPMethod.delete.rawValue, "DELETE")        
     }
-
 }

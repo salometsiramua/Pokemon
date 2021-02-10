@@ -35,7 +35,7 @@ class PokemonsListFetcherServiceTests: XCTestCase {
         
         let exp = expectation(description: "Pokemons list fetcher succeed")
         
-        service.fetch(url: nil) { (result) in
+        service.fetch(take: 20, skip: 20){ (result) in
             exp.fulfill()
             XCTAssertNotNil(result)
         }
