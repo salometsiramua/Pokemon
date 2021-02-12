@@ -44,7 +44,7 @@ final class PokemonsDetailsViewModelService: PokemonsDetailsViewModel {
         }
     }
     
-    func loadImages(from list: [String]) {
+    private func loadImages(from list: [String]) {
         list.forEach { (url) in
             loadImage(url: url) { [weak self] (image) in
                 guard let image = image else {

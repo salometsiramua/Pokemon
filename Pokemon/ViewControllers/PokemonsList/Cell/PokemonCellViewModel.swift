@@ -21,3 +21,9 @@ struct PokemonCellViewModel {
         self.image = image
     }
 }
+
+extension PokemonCellViewModel: Equatable {
+    static func == (lhs: PokemonCellViewModel, rhs: PokemonCellViewModel) -> Bool {
+        lhs.url == rhs.url
+    }
+}

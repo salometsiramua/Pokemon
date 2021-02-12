@@ -24,4 +24,14 @@ class StringTests: XCTestCase {
         let url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/299/"
         XCTAssertEqual(url.pokemonsIndex, "299")
     }
+    
+    func testGetPokemonsIndexFromEmptyUrl() {
+        let url = ""
+        XCTAssertNil(url.pokemonsIndex)
+    }
+    
+    func testGetPokemonsIndexFromUrlWithoutDashes() {
+        let url = "raw.githubusercontent.com"
+        XCTAssertEqual(url.pokemonsIndex, "raw.githubusercontent.com")
+    }
 }

@@ -136,7 +136,7 @@ final class PokemonsListViewModelService: PokemonsListViewModel {
         return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
     }
     
-    func startDownload(for photoRecord: Image, at indexPath: IndexPath) {
+    private func startDownload(for photoRecord: Image, at indexPath: IndexPath) {
 
         guard pendingOperations.downloadsInProgress[indexPath] == nil, pokemons[indexPath.row]?.image.state == ImageState.new else {
             return

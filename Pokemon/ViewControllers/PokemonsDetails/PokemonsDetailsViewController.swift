@@ -20,7 +20,7 @@ enum DetailsScreenScrollViews: Int {
 
 final class PokemonsDetailsViewController: UIViewController {
     
-    var viewModel: PokemonsDetailsViewModel
+    private(set) var viewModel: PokemonsDetailsViewModel
     
     private let name = UILabel(frame: .zero)
     private let weight = UILabel(frame: .zero)
