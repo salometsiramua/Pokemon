@@ -33,6 +33,11 @@ class HorizontalProgressBar: UIView {
     private func setupLayers() {
         layer.addSublayer(progressLayer)
     }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        setNeedsDisplay()
+    }
 
     override func draw(_ rect: CGRect) {
         backgroundMask.path = UIBezierPath(roundedRect: rect, cornerRadius: rect.height * 0.25).cgPath

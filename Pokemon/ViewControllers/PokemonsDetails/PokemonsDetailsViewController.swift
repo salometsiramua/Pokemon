@@ -99,7 +99,7 @@ final class PokemonsDetailsViewController: UIViewController {
         imagesContainerScrollView.addSubview(horizontalImagesStackView)
         imagesContainerScrollView.delegate = self
         imagesContainerScrollView.heightAnchor.constraint(equalTo: horizontalImagesStackView.heightAnchor).isActive = true
-        imagesContainerScrollView.heightAnchor.constraint(equalToConstant: view.frame.width * 0.7).isActive = true
+        imagesContainerScrollView.heightAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.7).isActive = true
         imagesContainerScrollView.isPagingEnabled = true
         
         horizontalImagesStackView.pin(to: imagesContainerScrollView)
@@ -200,7 +200,6 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
             title.translatesAutoresizingMaskIntoConstraints = false
             progressBar.translatesAutoresizingMaskIntoConstraints = false
             progressBar.heightAnchor.constraint(equalToConstant: 10).isActive = true
-            progressBar.widthAnchor.constraint(equalToConstant: view.frame.width * 0.8).isActive = true
             progressBar.color = Constants.Colors.appColor.value
             progressBar.backgroundColor = Constants.Colors.background.value
             progressBar.progress = CGFloat(stat.effort)/CGFloat(stat.baseStat)
@@ -209,6 +208,7 @@ extension PokemonsDetailsViewController: PokemonsDetailsUpdatedListener {
             title.text = "\(stat.stat.name.capitalized): \(stat.effort)/\(stat.baseStat)"
             title.setStyle(.text)
             statsStackView.addArrangedSubview(stackView)
+            progressBar.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8).isActive = true
         })
     }
     
